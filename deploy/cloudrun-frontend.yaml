@@ -1,0 +1,21 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: cafeflow-frontend
+  labels:
+    dev-tutorial: cloud-run-ai-challenge
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: "3"
+        autoscaling.knative.dev/minScale: "0"
+    spec:
+      containers:
+        - image: gcr.io/PROJECT_ID/cafeflow-frontend:latest
+          resources:
+            limits:
+              memory: 256Mi
+              cpu: 1000m
+          ports:
+            - containerPort: 3000

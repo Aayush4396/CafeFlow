@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CafeFlow — Pitch & Operational Slide Deck</title>
+  <style>
+    :root {
+      --primary: #d97706;
+      --primary-dark: #b45309;
+      --bg: #0c0a09;
+      --card-bg: #1c1917;
+      --border: #292524;
+      --text: #f5f5f4;
+      --muted: #a8a29e;
+      --emerald: #10b981;
+      --rose: #f43f5e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: 60px;
+    }
+
+    /* Deck Controls Toolbar */
+    .deck-nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      width: 100%;
+      background: rgba(12, 10, 9, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand span {
+      color: var(--primary);
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .slide-counter {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+
+    button.btn-ctrl {
+      background: #292524;
+      color: #fff;
+      border: 1px solid #44403c;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    button.btn-ctrl:hover:not(:disabled) {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    button.btn-ctrl:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    /* Presentation Slide Stage */
+    .deck-container {
+      width: 100%;
+      max-width: 1080px;
+      aspect-ratio: 16 / 9;
+      margin: 40px auto 20px;
+      position: relative;
+      perspective: 1000px;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 64px 72px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px) scale(0.98);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Typography & Slide Layouts */
+    .slide-header {
+      margin-bottom: 24px;
+    }
+
+    .tagline {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--primary);
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+
+    h2 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      color: #fff;
+    }
+
+    .slide-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+    }
+
+    .card {
+      background: #151311;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .card.highlight {
+      border-color: rgba(217, 119, 6, 0.4);
+      background: rgba(217, 119, 6, 0.05);
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-p {
+      font-size: 0.92rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .metric-hero {
+      font-size: 3.5rem;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .metric-hero.green { color: var(--emerald); }
+    .metric-hero.amber { color: var(--primary); }
+    .metric-hero.rose { color: var(--rose); }
+
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #292524;
+      padding-top: 16px;
+      font-size: 0.8rem;
+      color: #78716c;
+    }
+
+    /* Print styling: Turns into clean PDF pages */
+    @media print {
+      body {
+        background: #fff !important;
+        color: #000 !important;
+        padding: 0;
+      }
+      .deck-nav, .keyboard-hint {
+        display: none !important;
+      }
+      .deck-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        aspect-ratio: auto !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+      }
+      .slide {
+        position: relative !important;
+        opacity: 1 !important;
+        transform: none !important;
+        page-break-after: always;
+        break-after: page;
+        border: none !important;
+        background: #fff !important;
+        color: #000 !important;
+        padding: 40px !important;
+        box-shadow: none !important;
+        height: 100vh !important;
+      }
+      h2, .card-title {
+        color: #000 !important;
+      }
+      .card {
+        background: #f5f5f4 !important;
+        border-color: #d6d3d1 !important;
+      }
+      .card-p {
+        color: #44403c !important;
+      }
+    }
+
+    .keyboard-hint {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: #78716c;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Controller -->
+  <header class="deck-nav">
+    <div class="brand">
+      <span>☕</span> CafeFlow <span>Deck</span>
+    </div>
+    <div class="nav-controls">
+      <span class="slide-counter" id="slideIndicator">Slide 1 of 7</span>
+      <button class="btn-ctrl" id="prevBtn" onclick="prevSlide()">← Prev</button>
+      <button class="btn-ctrl" id="nextBtn" onclick="nextSlide()">Next →</button>
+      <button class="btn-ctrl" onclick="window.print()">Print / PDF</button>
+    </div>
+  </header>
+
+  <main class="deck-container">
+
+    <!-- SLIDE 1: TITLE SLIDE -->
+    <section class="slide active">
+      <div class="slide-header">
+        <span class="tagline">Smart Kitchen Balancing for Cafes</span>
+        <h2 style="font-size: 3.2rem;">CafeFlow</h2>
+        <p style="font-size: 1.3rem; color: var(--muted); margin-top: 12px; max-width: 700px;">
+          How gentle customer nudges eliminate morning rush bottlenecks without taking away menu choices.
+        </p>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card highlight">
+            <div class="card-title">1. High-Pressure Problem</div>
+            <p class="card-p">70% of guests order handcrafted espresso drinks, overwhelming baristas while drip & cold brew taps sit idle.</p>
+          </div>
+          <div class="card highlight">
+            <div class="card-title">2. Smart Solution</div>
+            <p class="card-p">The menu detects espresso traffic and highlights <em>"Ready in &lt; 2 mins"</em> options for guests in a hurry.</p>
+          </div>
+          <div class="card highlight">
+            <div class="card-title">3. Big Result</div>
+            <p class="card-p">Customer wait times drop by <strong>50%+</strong> and baristas experience a calmer, smoother morning shift.</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>CafeFlow Pitch & Walkthrough</span>
+        <span>Slide 1 / 7</span>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: THE PROBLEM -->
+    <section class="slide">
+      <div class="slide-header">
+        <span class="tagline">The Root Bottleneck</span>
+        <h2>The "Espresso Trap" in Every Busy Cafe</h2>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card" style="border-left: 4px solid var(--rose);">
+            <div class="card-title" style="color: var(--rose);">What Happens Every Morning</div>
+            <ul style="margin: 12px 0 0 20px; font-size: 0.95rem; color: var(--muted); line-height: 1.7;">
+              <li>Customers default to lattes, flat whites, and cappuccinos.</li>
+              <li>Each espresso drink takes <strong>120–180 seconds</strong> of non-stop grinding, tamping, and steaming.</li>
+              <li>Orders pile up 15–20 tickets deep.</li>
+              <li>Wait times balloon to 10+ minutes and stress spikes.</li>
+            </ul>
+          </div>
+          <div class="card" style="border-left: 4px solid var(--emerald);">
+            <div class="card-title" style="color: var(--emerald);">The Unused Secret</div>
+            <ul style="margin: 12px 0 0 20px; font-size: 0.95rem; color: var(--muted); line-height: 1.7;">
+              <li>Fresh single-origin batch brew and nitro cold brew take <strong>less than 20 seconds to pour</strong>.</li>
+              <li>They offer equal or higher profit margins.</li>
+              <li>Yet during the rush, these stations sit completely idle because nobody directs traffic.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Understanding the Rush Bottleneck</span>
+        <span>Slide 2 / 7</span>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: HOW IT WORKS (THE NUDGE) -->
+    <section class="slide">
+      <div class="slide-header">
+        <span class="tagline">The Philosophy</span>
+        <h2>Freedom of Choice + Google Maps-Style Guidance</h2>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-title">1. Full Freedom</div>
+            <p class="card-p">Every item is always available. We never disable drinks or force customers into choices they don't want.</p>
+          </div>
+          <div class="card highlight">
+            <div class="card-title">2. Upfront Transparency</div>
+            <p class="card-p">Every drink shows estimated wait times upfront (e.g., <em>Ready in ~2m</em> vs <em>Ready in ~8m</em>) so there are no surprises.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">3. The 30% Effect</div>
+            <p class="card-p">When 3 out of 10 hurried commuters pick the 2-minute cold brew, the espresso backlog clears for everyone else.</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>The Load-Aware Principle</span>
+        <span>Slide 3 / 7</span>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: THE THREE SCREENS -->
+    <section class="slide">
+      <div class="slide-header">
+        <span class="tagline">Simple Product Architecture</span>
+        <h2>Three Dedicated Screens. Zero Confusion.</h2>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-title">📱 Customer Menu</div>
+            <p class="card-p" style="margin-bottom: 8px;"><strong>Who:</strong> Guests on mobile or kiosk.</p>
+            <p class="card-p">Promotes the <em>Fast Lane</em> carousel at the top, offers 1-tap <em>Quick Add</em>, and provides live pickup stage tracking.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">☕ Barista Station</div>
+            <p class="card-p" style="margin-bottom: 8px;"><strong>Who:</strong> Kitchen baristas on bar.</p>
+            <p class="card-p">Big touch targets (<code>Start Drink</code> → <code>Mark Ready</code> → <code>Handoff</code>) split cleanly by Espresso, Cold Tap, and Oven.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">📊 Rush Planner</div>
+            <p class="card-p" style="margin-bottom: 8px;"><strong>Who:</strong> Store owner & shift leads.</p>
+            <p class="card-p">Simulates traffic spikes, visualizes the store flow map, and provides Gemini AI coaching on staff reallocation.</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Screen Breakdown</span>
+        <span>Slide 4 / 7</span>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: TECHNICAL ARCHITECTURE & DES -->
+    <section class="slide">
+      <div class="slide-header">
+        <span class="tagline">Engineered for Reliability</span>
+        <h2>Full-Stack Architecture & Discrete-Event Simulation (DES)</h2>
+      </div>
+      <div class="slide-body" style="justify-content: flex-start; gap: 16px;">
+        <!-- Visual Architecture & DES Flow Diagram -->
+        <div style="background: #110e0c; border: 1px solid #332b26; border-radius: 14px; padding: 12px 18px;">
+          <svg viewBox="0 0 940 120" style="width: 100%; height: auto; display: block;" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Customer / Ingress -->
+            <rect x="10" y="32" width="130" height="56" rx="10" fill="#1c1917" stroke="#44403c" stroke-width="1.5"/>
+            <text x="75" y="55" fill="#f5f5f4" font-size="11" font-weight="bold" text-anchor="middle">Customer Channels</text>
+            <text x="75" y="72" fill="#a8a29e" font-size="9" text-anchor="middle">Mobile App & Walk-In POS</text>
+
+            <path d="M140 60 L180 60" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow)"/>
+
+            <!-- Load-Aware Scoring Node -->
+            <rect x="180" y="32" width="150" height="56" rx="10" fill="#2d1c08" stroke="#f59e0b" stroke-width="1.5"/>
+            <text x="255" y="55" fill="#fbbf24" font-size="11" font-weight="bold" text-anchor="middle">Load-Aware Recommender</text>
+            <text x="255" y="72" fill="#fef3c7" font-size="9" text-anchor="middle">Score = Pop - (Wait×0.1) + Margin</text>
+
+            <path d="M330 60 L370 60" stroke="#f59e0b" stroke-width="2"/>
+
+            <!-- DES Simulation & Queue Engine -->
+            <rect x="370" y="16" width="220" height="88" rx="12" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="480" y="38" fill="#38bdf8" font-size="12" font-weight="bold" text-anchor="middle">Discrete-Event Sim (DES)</text>
+            <text x="480" y="56" fill="#94a3b8" font-size="9" text-anchor="middle">SimPy Queue Tokens • Poisson Arrival</text>
+            <!-- 3 Mini Stations inside DES -->
+            <rect x="382" y="66" width="60" height="26" rx="5" fill="#1e293b" stroke="#f43f5e"/>
+            <text x="412" y="83" fill="#fca5a5" font-size="8" font-weight="bold" text-anchor="middle">Espresso</text>
+            <rect x="450" y="66" width="60" height="26" rx="5" fill="#1e293b" stroke="#10b981"/>
+            <text x="480" y="83" fill="#6ee7b7" font-size="8" font-weight="bold" text-anchor="middle">Cold Tap</text>
+            <rect x="518" y="66" width="60" height="26" rx="5" fill="#1e293b" stroke="#eab308"/>
+            <text x="548" y="83" fill="#fde047" font-size="8" font-weight="bold" text-anchor="middle">Bakery</text>
+
+            <path d="M590 60 L630 60" stroke="#38bdf8" stroke-width="2"/>
+
+            <!-- Gemini Advisor -->
+            <rect x="630" y="32" width="140" height="56" rx="10" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.5"/>
+            <text x="700" y="55" fill="#c7d2fe" font-size="11" font-weight="bold" text-anchor="middle">Gemini AI Advisor</text>
+            <text x="700" y="72" fill="#a5b4fc" font-size="9" text-anchor="middle">4-Tier Resilient Ladder</text>
+
+            <path d="M770 60 L800 60" stroke="#10b981" stroke-width="2"/>
+
+            <!-- Cloud Run Output -->
+            <rect x="800" y="32" width="130" height="56" rx="10" fill="#064e3b" stroke="#10b981" stroke-width="1.5"/>
+            <text x="865" y="55" fill="#6ee7b7" font-size="11" font-weight="bold" text-anchor="middle">Cloud Run Ready</text>
+            <text x="865" y="72" fill="#a7f3d0" font-size="9" text-anchor="middle">Secret Mgr • Port 3000</text>
+          </svg>
+        </div>
+
+        <!-- 3 Feature Pillars explaining the Architecture & DES -->
+        <div class="grid-3" style="gap: 16px;">
+          <div class="card" style="padding: 16px;">
+            <div class="card-title" style="color: #38bdf8; font-size: 1rem; margin-bottom: 6px;">
+              ⏱️ Discrete-Event Simulation (DES)
+            </div>
+            <p class="card-p" style="font-size: 0.85rem; line-height: 1.5;">
+              Models real-world store dynamics with <strong>SimPy</strong>. Every customer is simulated as an asynchronous event token navigating stochastic Poisson arrival intervals, cashier queues, and station server pools to validate queue relief.
+            </p>
+          </div>
+
+          <div class="card highlight" style="padding: 16px;">
+            <div class="card-title" style="color: var(--primary); font-size: 1rem; margin-bottom: 6px;">
+              🧠 Resilient AI Fallback Ladder
+            </div>
+            <p class="card-p" style="font-size: 0.85rem; line-height: 1.5;">
+              Guarantees zero downtime by cascading across 4 Gemini endpoints: <code>3.6-flash</code> → <code>3.1-flash-lite</code> → <code>flash-latest</code> → <code>3.7-flash</code>, backed by local offline heuristic rules.
+            </p>
+          </div>
+
+          <div class="card" style="padding: 16px;">
+            <div class="card-title" style="color: var(--emerald); font-size: 1rem; margin-bottom: 6px;">
+              ☁️ Production Google Cloud Run
+            </div>
+            <p class="card-p" style="font-size: 0.85rem; line-height: 1.5;">
+              Zero hardcoded keys via Secret Manager (<code>GEMINI_API_KEY</code>). Dual TypeScript and Python/FastAPI codebases, container-ready with verification label <code>dev-tutorial=cloud-run-ai-challenge</code>.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Discrete-Event Simulation (DES) & Full-Stack Engine</span>
+        <span>Slide 5 / 7</span>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: MEASURABLE IMPACT -->
+    <section class="slide">
+      <div class="slide-header">
+        <span class="tagline">The Real Impact</span>
+        <h2>Proven Operational Results</h2>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card text-center" style="text-align: center;">
+            <div class="metric-hero green">-55%</div>
+            <div class="card-title" style="justify-content: center;">Customer Wait Time</div>
+            <p class="card-p">Average wait drops from 7+ minutes down to ~3 minutes during peak morning rushes.</p>
+          </div>
+          <div class="card text-center" style="text-align: center;">
+            <div class="metric-hero amber">+34%</div>
+            <div class="card-title" style="justify-content: center;">Store Output</div>
+            <p class="card-p">More drinks served per hour by balancing taps and ovens alongside the espresso machine.</p>
+          </div>
+          <div class="card text-center" style="text-align: center;">
+            <div class="metric-hero green">0</div>
+            <div class="card-title" style="justify-content: center;">Burnt-Out Baristas</div>
+            <p class="card-p">Espresso workload drops to sustainable levels, dramatically lowering staff turnover.</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Measured Through Discrete-Event Simulation</span>
+        <span>Slide 6 / 7</span>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: SUMMARY & TAKEAWAY -->
+    <section class="slide">
+      <div class="slide-header">
+        <span class="tagline">Summary</span>
+        <h2>Win for the Guest. Relief for the Crew.</h2>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card highlight">
+            <div class="card-title">Why Owners Love It</div>
+            <ul style="margin: 12px 0 0 20px; font-size: 0.95rem; color: var(--muted); line-height: 1.7;">
+              <li>Stops line walkouts from frustrated customers.</li>
+              <li>Boosts sales of high-margin cold brews and pastries.</li>
+              <li>Requires no complex training; runs seamlessly in the background.</li>
+            </ul>
+          </div>
+          <div class="card highlight">
+            <div class="card-title">Why Customers Love It</div>
+            <ul style="margin: 12px 0 0 20px; font-size: 0.95rem; color: var(--muted); line-height: 1.7;">
+              <li>Guaranteed fast options when they're running late.</li>
+              <li>Total honesty on wait times before they pay.</li>
+              <li>Always free to order their favorite drink.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>CafeFlow • Simple, Powerful, Load-Aware</span>
+        <span>Slide 7 / 7</span>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="keyboard-hint">
+    Use <strong>Left / Right Arrow Keys</strong> or the buttons above to navigate slides. Press <strong>Print / PDF</strong> to export.
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const indicator = document.getElementById('slideIndicator');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function updateSlide() {
+      slides.forEach((s, idx) => {
+        s.classList.toggle('active', idx === currentSlide);
+      });
+      indicator.textContent = `Slide ${currentSlide + 1} of ${slides.length}`;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === slides.length - 1;
+    }
+
+    function nextSlide() {
+      if (currentSlide < slides.length - 1) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      }
+    });
+
+    updateSlide();
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "CafeFlow: Load-Aware Cafe Experience & BPMN Simulator",
+  "description": "Smart cafe operating system featuring load-aware order routing, real-time Kitchen Display System (KDS), customer quick-pickup recommendations, and BPMN discrete-event queue simulation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
